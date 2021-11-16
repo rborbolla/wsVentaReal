@@ -1,8 +1,8 @@
 ﻿using System;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
-using System.IO;
 
 #nullable disable
 
@@ -19,15 +19,16 @@ namespace wsVentaReal.Models
         {
         }
 
+        public virtual DbSet<AppUsuario> AppUsuarios { get; set; }
         public virtual DbSet<Cliente> Clientes { get; set; }
-        public virtual DbSet<Concepto> Conceptos { get; set; }
+        public virtual DbSet<Concepto> Concepto { get; set; }
         public virtual DbSet<Producto> Productos { get; set; }
         public virtual DbSet<Venta> Venta { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-            {                
+            {
                 IConfigurationRoot configuration = new ConfigurationBuilder()
                   .SetBasePath(Directory.GetCurrentDirectory())
                   .AddJsonFile("appsettings.json")
@@ -40,6 +41,30 @@ namespace wsVentaReal.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "Modern_Spanish_CI_AS");
+
+            modelBuilder.Entity<AppUsuario>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("app_usuarios");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("email");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Nombre)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("nombre");
+
+                entity.Property(e => e.Password)
+                    .HasMaxLength(256)
+                    .IsUnicode(false)
+                    .HasColumnName("password");
+            });
 
             modelBuilder.Entity<Cliente>(entity =>
             {
